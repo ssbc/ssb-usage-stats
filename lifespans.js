@@ -8,7 +8,8 @@ module.exports = function (sbot, cb) {
 
     // get the timestamp of the last message for all users
     paramap(function (data, cb) {
-      if(data.ts) return cb(null, { id: data.id, last: data.ts })
+      // DONT use this, because our .first will be using the msg's declared timestamp, and this is the msg's local receive time
+      // if(data.ts) return cb(null, { id: data.id, last: data.ts })
 
       // handle some legacy: older users may not have .ts included in latest()
       pull(
