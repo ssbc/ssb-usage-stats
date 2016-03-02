@@ -29,6 +29,7 @@ window.onload = function () {
   getJSON('/lifespans.json', function (err, data) {
     var DAY = 1000*60*60*24
     var MONTH = DAY*30
+    var thisMonth = moment().startOf('month')
     var oneMonthAgo = moment().startOf('month').subtract(1, 'months').valueOf()
     var threeMonthsAgo = moment().startOf('month').subtract(3, 'months').valueOf()
 
@@ -50,7 +51,7 @@ window.onload = function () {
       // did this user survive for...
       var oneMonth = (user.lifespan > MONTH)
       var threeMonths = (user.lifespan > (MONTH*3))
-      var stillActive = (oneMonth && user.last > oneMonthAgo)
+      var stillActive = (oneMonth && user.last > thisMonth)
 
       // increment the buckets
       totalByMonth[startMonth] = (totalByMonth[startMonth]||0) + 1
