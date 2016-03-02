@@ -1,0 +1,131 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>  
+<script type="text/javascript" src="/moment.js"></script>
+<script type="text/javascript" src="/canvasjs.min.js"></script>
+<script type="text/javascript">
+window.onload = function () {
+  getJSON('/active-weekly.json', function (err, data) {
+    // put the data into a format that chartjs likes
+    data = data.map(function (item) {
+      return { x: item.sample, label: moment(item.ts).format("MMM Do 'YY"), y: item.users }
+    })
+    var chart = new CanvasJS.Chart("active-weekly",{
+      title: { text: "Weekly Usage" },
+      axisY: { title: 'Active Users' },
+      data: [{type: 'line', color: '#06c', dataPoints: data}]
+    })
+    chart.render();
+  })
+  getJSON('/active-timespans.json', function (err, data) {
+    document.getElementById('active-timespans').innerHTML = [
+      '<table><tr><td><strong>Active Today:</strong> <span>'+data.day+'</span></td>',
+      '<td><strong>Active This Week:</strong> <span>'+data.week+'</span></td>',
+      '<td><strong>Active This Month:</strong> <span>'+data.month+'</span></td>',
+      '<td><strong>Active All Time:</strong> <span>'+data.forever+'</span></td></tr></table>'
+    ].join('')
+  })
+  getJSON('/lifespans.json', function (err, data) {
+    var DAY = 1000*60*60*24
+    var MONTH = DAY*30
+    var oneMonthAgo = moment().startOf('month').subtract(1, 'months').valueOf()
+    var threeMonthsAgo = moment().startOf('month').subtract(3, 'months').valueOf()
+
+    // retention buckets
+    var totalByMonth = {} // how many users started, by month
+    var oneMonthByMonth = {} // what number survived 1 month, by month
+    var threeMonthsByMonth = {} // what number survived 3 months, by month
+    var stillActivesByMonth = {} // what number are still active, by month
+
+    var maxUsers = 0, totalUsers = data.length
+    data.forEach(function (user) {
+      // what month did the user start?
+      var startMonth = +moment(user.first).startOf('month').valueOf()
+
+      // was it more than a month ago?
+      if (startMonth > oneMonthAgo)
+        return // too recent for us to chart, yet
+
+      // did this user survive for...
+      var oneMonth = (user.lifespan > MONTH)
+      var threeMonths = (user.lifespan > (MONTH*3))
+      var stillActive = (oneMonth && user.last > oneMonthAgo)
+
+      // increment the buckets
+      totalByMonth[startMonth] = (totalByMonth[startMonth]||0) + 1
+      if (oneMonth) oneMonthByMonth[startMonth] = (oneMonthByMonth[startMonth]||0) + 1
+      if (startMonth < threeMonthsAgo && threeMonths) threeMonthsByMonth[startMonth] = (threeMonthsByMonth[startMonth]||0) + 1
+      if (stillActive) stillActivesByMonth[startMonth] = (stillActivesByMonth[startMonth]||0) + 1
+    })
+
+    // convert the buckets to data points that chartjs can use
+    var oneMonthDatapoints = []
+    var threeMonthsDatapoints = []
+    var stillActivesDatapoints = []
+    Object.keys(oneMonthByMonth).sort().forEach(function (ts, i) {
+      ts = +ts
+      oneMonthDatapoints.push({ x: i, ts: ts, y: oneMonthByMonth[ts] / totalByMonth[ts], label: 'Stayed active for 1 month', indexLabel: 'of '+totalByMonth[ts] })
+      if (threeMonthsByMonth[ts])
+        threeMonthsDatapoints.push({ x: i, ts: ts, y: threeMonthsByMonth[ts] / totalByMonth[ts], label: 'Stayed active for 3 months' })
+      stillActivesDatapoints.push({ x: i, ts: ts, y: stillActivesByMonth[ts] / totalByMonth[ts], label: 'Never stopped using it' })
+    })
+
+    // plot
+    var chart = new CanvasJS.Chart("retention",{
+      title: { text: "User Retention" },
+      axisX: { interval: 1, labelFormatter: function (e) { return (e.value in oneMonthDatapoints) ? moment(oneMonthDatapoints[e.value].ts).format("MMM 'YY") : '' } },
+      axisY: { title: '% of new users to stay active', valueFormatString: '##%', minimum: 0, maximum: 1.1 },
+      data: [
+        {name: 'For 1 month', showInLegend: true, color: '#06c', yValueFormatString: '##%', dataPoints: oneMonthDatapoints},
+        {name: 'For 3 months', showInLegend: true, color: '#6c0', yValueFormatString: '##%', dataPoints: threeMonthsDatapoints},
+        {name: 'Still active', showInLegend: true, color: '#c60', yValueFormatString: '##%', dataPoints: stillActivesDatapoints}
+      ]
+    })
+    chart.render();
+  })
+}
+
+function getJSON (url, cb) {
+  var request = new XMLHttpRequest();
+  request.open('GET', url, true);
+  request.onload = function() {
+    if (request.status >= 200 && request.status < 400)
+      cb(null, JSON.parse(request.responseText))
+    else
+      throw request
+  }
+  request.onerror = function() {
+    throw request
+  }
+  request.send()
+}
+</script>
+<style>
+#active-timespans table {
+  width: 100%;
+}
+#active-timespans td {
+  text-align: center;
+  font-size: 21px;
+}
+hr {
+  border: 0;
+  border-top: 1px solid #ccc;
+  margin: 40px;
+}
+p {
+  text-align: center;
+}
+</style>
+</head>
+<body>
+  <div id="active-weekly" style="height: 300px; width: 100%;"></div>
+  <div id="active-timespans"></div>
+  <p>This graph tells us how many users are active on the SSB network. If it's increasing, then we're experiencing net growth.</p>
+  <hr>
+  <div id="retention" style="height: 400px; width: 100%;"></div>
+  <p>This graph tells us, for each month, how long users have stayed active.</p>
+  <hr>
+</body>
+</html>

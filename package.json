@@ -1,0 +1,31 @@
+{
+  "name": "ssb-usage-stats",
+  "version": "1.0.0",
+  "description": "Generate usage stats for the ssb network",
+  "main": "index.js",
+  "dependencies": {
+    "pull-paramap": "^1.1.3",
+    "pull-stream": "^3.2.0",
+    "pull-window": "^2.1.3",
+    "ssb-client": "^3.0.0",
+    "yargs": "^4.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/%3Assbc/ssb-usage-stats.git"
+  },
+  "keywords": [
+    "ssb",
+    "stats"
+  ],
+  "author": "Paul Frazee <pfrazee@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/%3Assbc/ssb-usage-stats/issues"
+  },
+  "homepage": "https://github.com/%3Assbc/ssb-usage-stats#readme"
+}
