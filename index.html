@@ -5,12 +5,21 @@
 <script type="text/javascript" src="/moment.js"></script>
 <script type="text/javascript" src="/canvasjs.min.js"></script>
 <script type="text/javascript">
+var DAY = 1000*60*60*24
+var MONTH = DAY*30
+var thisMonth = moment().startOf('month')
+var oneWeekAgo = moment().subtract(1, 'week').valueOf()
+var oneMonthAgo = moment().startOf('month').subtract(1, 'months').valueOf()
+var threeMonthsAgo = moment().startOf('month').subtract(3, 'months').valueOf()
+
 window.onload = function () {
   getJSON('/active-weekly.json', function (err, data) {
     // put the data into a format that chartjs likes
-    data = data.map(function (item) {
-      return { x: item.sample, label: moment(item.ts).format("MMM Do 'YY"), y: item.users }
-    })
+    data = data
+      .filter(function (item) { return (item.ts < oneWeekAgo) }) // dont show a week that's still in progress
+      .map(function (item) {
+        return { x: item.sample, label: moment(item.ts).format("MMM Do 'YY"), y: item.users }
+      })
     var chart = new CanvasJS.Chart("active-weekly",{
       title: { text: "Weekly Usage" },
       axisY: { title: 'Active Users' },
@@ -27,12 +36,6 @@ window.onload = function () {
     ].join('')
   })
   getJSON('/lifespans.json', function (err, data) {
-    var DAY = 1000*60*60*24
-    var MONTH = DAY*30
-    var thisMonth = moment().startOf('month')
-    var oneMonthAgo = moment().startOf('month').subtract(1, 'months').valueOf()
-    var threeMonthsAgo = moment().startOf('month').subtract(3, 'months').valueOf()
-
     // retention buckets
     var totalByMonth = {} // how many users started, by month
     var oneMonthByMonth = {} // what number survived 1 month, by month
