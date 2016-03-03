@@ -51,7 +51,7 @@ window.onload = function () {
       // did this user survive for...
       var oneMonth = (user.lifespan > MONTH)
       var threeMonths = (user.lifespan > (MONTH*3))
-      var stillActive = (oneMonth && user.last > thisMonth)
+      var stillActive = (user.last > thisMonth)
 
       // increment the buckets
       totalByMonth[startMonth] = (totalByMonth[startMonth]||0) + 1
@@ -60,22 +60,24 @@ window.onload = function () {
       if (stillActive) stillActivesByMonth[startMonth] = (stillActivesByMonth[startMonth]||0) + 1
     })
 
+    console.log(totalByMonth)
+
     // convert the buckets to data points that chartjs can use
     var oneMonthDatapoints = []
     var threeMonthsDatapoints = []
     var stillActivesDatapoints = []
-    Object.keys(oneMonthByMonth).sort().forEach(function (ts, i) {
+    Object.keys(totalByMonth).sort().forEach(function (ts, i) {
       ts = +ts
       oneMonthDatapoints.push({ x: i, ts: ts, y: oneMonthByMonth[ts] / totalByMonth[ts], label: 'Stayed active for 1 month', indexLabel: 'of '+totalByMonth[ts] })
       if (threeMonthsByMonth[ts])
-        threeMonthsDatapoints.push({ x: i, ts: ts, y: threeMonthsByMonth[ts] / totalByMonth[ts], label: 'Stayed active for 3 months' })
-      stillActivesDatapoints.push({ x: i, ts: ts, y: stillActivesByMonth[ts] / totalByMonth[ts], label: 'Never stopped using it' })
+        threeMonthsDatapoints.push({ x: i, ts: ts, y: threeMonthsByMonth[ts] / totalByMonth[ts], label: 'Stayed active for 3 months', indexLabel: 'of '+totalByMonth[ts] })
+      stillActivesDatapoints.push({ x: i, ts: ts, y: stillActivesByMonth[ts] / totalByMonth[ts], label: 'Never stopped using it', indexLabel: 'of '+totalByMonth[ts] })
     })
 
     // plot
     var chart = new CanvasJS.Chart("retention",{
       title: { text: "User Retention" },
-      axisX: { interval: 1, labelFormatter: function (e) { return (e.value in oneMonthDatapoints) ? moment(oneMonthDatapoints[e.value].ts).format("MMM 'YY") : '' } },
+      axisX: { interval: 1, labelFormatter: function (e) { return e.value + ' ' + ((e.value in oneMonthDatapoints) ? moment(oneMonthDatapoints[e.value].ts).format("MMM 'YY") : '') } },
       axisY: { title: '% of new users to stay active', valueFormatString: '##%', minimum: 0, maximum: 1.1 },
       data: [
         {name: 'For 1 month', showInLegend: true, color: '#06c', yValueFormatString: '##%', dataPoints: oneMonthDatapoints},
@@ -126,7 +128,7 @@ p {
   <p>This graph tells us how many users are active on the SSB network. If it's increasing, then we're experiencing net growth.</p>
   <hr>
   <div id="retention" style="height: 400px; width: 100%;"></div>
-  <p>This graph tells us, for each month, how long users have stayed active.</p>
+  <p>This graph tells us, for each month, how long users have stayed active.<br>(Note: 1 month and 3 month won't be visible until 1/3 mos after they join.)</p>
   <hr>
 </body>
 </html>
