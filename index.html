@@ -9,8 +9,9 @@ var DAY = 1000*60*60*24
 var MONTH = DAY*30
 var thisMonth = moment().startOf('month')
 var oneWeekAgo = moment().subtract(1, 'week').valueOf()
-var oneMonthAgo = moment().startOf('month').subtract(1, 'months').valueOf()
-var threeMonthsAgo = moment().startOf('month').subtract(3, 'months').valueOf()
+var twoWeeksAgo = moment().subtract(2, 'week').valueOf()
+var startOfPreviousMonth = moment().startOf('month').subtract(1, 'months').valueOf()
+var startOfThreeMonthsAgo = moment().startOf('month').subtract(3, 'months').valueOf()
 
 window.onload = function () {
   getJSON('/active-weekly.json', function (err, data) {
@@ -48,22 +49,20 @@ window.onload = function () {
       var startMonth = +moment(user.first).startOf('month').valueOf()
 
       // was it more than a month ago?
-      if (startMonth > oneMonthAgo)
+      if (startMonth > startOfPreviousMonth)
         return // too recent for us to chart, yet
 
       // did this user survive for...
       var oneMonth = (user.lifespan > MONTH)
       var threeMonths = (user.lifespan > (MONTH*3))
-      var stillActive = (user.last > thisMonth)
+      var stillActive = (user.last > twoWeeksAgo)
 
       // increment the buckets
       totalByMonth[startMonth] = (totalByMonth[startMonth]||0) + 1
       if (oneMonth) oneMonthByMonth[startMonth] = (oneMonthByMonth[startMonth]||0) + 1
-      if (startMonth < threeMonthsAgo && threeMonths) threeMonthsByMonth[startMonth] = (threeMonthsByMonth[startMonth]||0) + 1
+      if (startMonth < startOfThreeMonthsAgo && threeMonths) threeMonthsByMonth[startMonth] = (threeMonthsByMonth[startMonth]||0) + 1
       if (stillActive) stillActivesByMonth[startMonth] = (stillActivesByMonth[startMonth]||0) + 1
     })
-
-    console.log(totalByMonth)
 
     // convert the buckets to data points that chartjs can use
     var oneMonthDatapoints = []
