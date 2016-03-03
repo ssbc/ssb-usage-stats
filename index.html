@@ -48,8 +48,8 @@ window.onload = function () {
       // what month did the user start?
       var startMonth = +moment(user.first).startOf('month').valueOf()
 
-      // was it more than a month ago?
-      if (startMonth > startOfPreviousMonth)
+      // was it this month, or did they start in the last too weeks?
+      if (startMonth == thisMonth || user.first > twoWeeksAgo)
         return // too recent for us to chart, yet
 
       // did this user survive for...
@@ -133,7 +133,7 @@ p {
   <p>
     This graph tells us, for each month, how long users have stayed active.<br>
     Note: 1 month and 3 month won't be visible until 1/3 mos after they join.<br>
-    Also, "still active" is defined as, "did something in the last 2 weeks," so the most recent month may not be an accurate view of retention.
+    Also, "still active" is defined as, "did something in the last 2 weeks."
   </p>
   <hr>
 </body>
