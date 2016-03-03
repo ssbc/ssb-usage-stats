@@ -30,8 +30,8 @@ window.onload = function () {
   getJSON('/active-timespans.json', function (err, data) {
     document.getElementById('active-timespans').innerHTML = [
       '<table><tr><td><strong>Active Today:</strong> <span>'+data.day+'</span></td>',
-      '<td><strong>Active This Week:</strong> <span>'+data.week+'</span></td>',
-      '<td><strong>Active This Month:</strong> <span>'+data.month+'</span></td>',
+      '<td><strong>Active Last Week:</strong> <span>'+data.week+'</span></td>',
+      '<td><strong>Active Last Month:</strong> <span>'+data.month+'</span></td>',
       '<td><strong>Active All Time:</strong> <span>'+data.forever+'</span></td></tr></table>'
     ].join('')
   })
