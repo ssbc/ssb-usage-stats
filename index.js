@@ -4,6 +4,7 @@ var ssbc = require('ssb-client')
 var cmds = {
   'active-timespans': require('./active-timespans'),
   'active-weekly': require('./active-weekly'),
+  'active-daily': require('./active-daily'),
   'lifespans': require('./lifespans')
 }
 var cmd = cmds[argv._[0]]
@@ -23,5 +24,6 @@ function usage () {
   console.log('node index.js {'+Object.keys(cmds).join('|')+'}')
   console.log('  active-timespans: number of active users, for a set of past time intervals')
   console.log('  active-weekly: number of active users, per week')
+  console.log('  active-daily: daily activity and stuff')
   console.log('  lifespans: how long users are staying active (retention)')
 }
