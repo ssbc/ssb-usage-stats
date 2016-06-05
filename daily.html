@@ -26,16 +26,6 @@ var colors20 = [
   [255, 106, 152]
 ]
 
-function getColor(x) {
-  var i = Math.floor(x*20)
-  var a = colors20[i]
-  var b = colors20[i+1]
-  var n = x*20 - i
-  var c =  interpolate(a, b, x*20 - i)
-  c[3] = 255
-  return c
-}
-
 function interpolate(a, b, n) {
   if (!a) a = [0, 0, 0, 0]
   if (!b) b = [0, 0, 0, 0]
@@ -86,6 +76,17 @@ var beginDate
 var userNames
 var userImages
 
+function getUserColor(userI) {
+  var x = userFirst[userI] / grid.length
+  var i = Math.floor(x*20)
+  var a = colors20[i]
+  var b = colors20[i+1]
+  var n = x*20 - i
+  var c = interpolate(a, b, x*20 - i)
+  c[3] = 255
+  return c
+}
+
 function setPixel(imgData, x, y, color) {
   var h = canvasH
   var w = grid.length
@@ -114,9 +115,6 @@ getJSON('daily.json', function (err, data) {
   pixelW = Math.floor(window.innerWidth / w)
   pixelH = pixelW
 
-  for (var i = 0; i < h; i++)
-    userColors[i] = getColor(i/h)
-
   // make the grid like a stacked histogram
   for (var x = 0; x < w; x++) {
     var dayUsers = []
@@ -137,6 +135,9 @@ getJSON('daily.json', function (err, data) {
 
   canvas.height = canvasH * pixelH
   canvas.width = w * pixelW
+
+  for (var i = 0; i < h; i++)
+    userColors[i] = getUserColor(i)
 
   var imgData = ctx.createImageData(w * pixelW, h * pixelH)
   for (var x = 0; x < w; x++)
