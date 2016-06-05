@@ -2,8 +2,8 @@
 <html>
 
 <head>  
-<script type="text/javascript" src="/moment.js"></script>
-<script type="text/javascript" src="/canvasjs.min.js"></script>
+<script type="text/javascript" src="moment.js"></script>
+<script type="text/javascript" src="canvasjs.min.js"></script>
 <script type="text/javascript">
 var DAY = 1000*60*60*24
 var MONTH = DAY*30
@@ -14,7 +14,7 @@ var startOfPreviousMonth = moment().startOf('month').subtract(1, 'months').value
 var startOfThreeMonthsAgo = moment().startOf('month').subtract(3, 'months').valueOf()
 
 window.onload = function () {
-  getJSON('/active-weekly.json', function (err, data) {
+  getJSON('active-weekly.json', function (err, data) {
     // put the data into a format that chartjs likes
     data = data
       .filter(function (item) { return (item.ts < oneWeekAgo) }) // dont show a week that's still in progress
@@ -28,7 +28,7 @@ window.onload = function () {
     })
     chart.render();
   })
-  getJSON('/active-timespans.json', function (err, data) {
+  getJSON('active-timespans.json', function (err, data) {
     document.getElementById('active-timespans').innerHTML = [
       '<table><tr><td><strong>Active Today:</strong> <span>'+data.day+'</span></td>',
       '<td><strong>Active Last Week:</strong> <span>'+data.week+'</span></td>',
@@ -36,7 +36,7 @@ window.onload = function () {
       '<td><strong>Active All Time:</strong> <span>'+data.forever+'</span></td></tr></table>'
     ].join('')
   })
-  getJSON('/lifespans.json', function (err, data) {
+  getJSON('lifespans.json', function (err, data) {
     // retention buckets
     var totalByMonth = {} // how many users started, by month
     var oneMonthByMonth = {} // what number survived 1 month, by month
