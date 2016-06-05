@@ -43,6 +43,11 @@ function interpolate(a, b, n) {
 <body>
 
 <div style="text-align:center">
+  <div style="float:right">
+    <label for="bw-checkbox">
+      B/W: <input id="bw-checkbox" type="checkbox" />
+    </label>
+  </div>
   <h2>Daily active users</h2>
   <canvas id="grid"></canvas>
 </div>
@@ -62,6 +67,7 @@ function interpolate(a, b, n) {
 </div>
 <script>
 var canvas = document.getElementById('grid')
+var bwCheckbox = document.getElementById('bw-checkbox')
 var ctx = canvas.getContext('2d')
 var userIds = []
 var userColors = []
@@ -75,9 +81,19 @@ var userLast = [] // last day active
 var beginDate
 var userNames
 var userImages
+var bw = bwCheckbox.checked
+
+function initUserColors() {
+  for (var i = 0; i < userIds.length; i++)
+    userColors[i] = getUserColor(i)
+}
 
 function getUserColor(userI) {
   var x = userFirst[userI] / grid.length
+  if (bw) {
+    x = 0.95 - 0.5 * x
+    return [x*255, x*255, x*255, 255]
+  }
   var i = Math.floor(x*20)
   var a = colors20[i]
   var b = colors20[i+1]
@@ -136,15 +152,18 @@ getJSON('daily.json', function (err, data) {
   canvas.height = canvasH * pixelH
   canvas.width = w * pixelW
 
-  for (var i = 0; i < h; i++)
-    userColors[i] = getUserColor(i)
+  initUserColors()
+  drawAll()
+})
 
+function drawAll() {
+  var w = grid.length, h = canvasH
   var imgData = ctx.createImageData(w * pixelW, h * pixelH)
   for (var x = 0; x < w; x++)
     for (var y = 0; y < grid[x].length; y++)
       setPixel(imgData, x, y, userColors[grid[x][y]])
   ctx.putImageData(imgData, 0, 0)
-})
+}
 
 var dayInfo = document.getElementById('day-info')
 var userInfo = document.getElementById('user-info')
@@ -161,6 +180,12 @@ var activeDay
 var activeUser = 0
 var selectedUser
 var selectedDay
+
+bwCheckbox.addEventListener('change', function (e) {
+  bw = this.checked
+  initUserColors()
+  drawAll()
+}, false)
 
 canvas.addEventListener('mousedown', function (e) {
   var x = Math.floor(e.offsetX/pixelW)
