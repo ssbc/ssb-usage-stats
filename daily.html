@@ -225,7 +225,7 @@ var colors = {
 
 function dayStr(day) {
   return isNaN(day) ? '' :
-    new Date(+beginDate + day * 86400000).toDateString()
+    new Date(+beginDate + (day + 1) * 86400000).toDateString()
 }
 
 function setHighlight(userI, oldI, dayX, oldX) {
