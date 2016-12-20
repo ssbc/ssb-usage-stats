@@ -7,12 +7,22 @@
     "pull-paramap": "^1.1.3",
     "pull-stream": "^3.2.0",
     "pull-window": "^2.1.3",
-    "ssb-client": "^3.0.0",
+    "ssb-client": "^4.4.0",
     "yargs": "^4.2.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "ecstatic": "^2.1.0"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dump:timespans": "node index.js active-timespans > ./active-timespans.json",
+    "dump:weekly": "node index.js active-weekly > ./active-weekly.json",
+    "dump:lifespans": "node index.js lifespans > ./lifespans.json",
+    "dump:daily": "node index.js active-daily > ./daily.json",
+    "dump": "npm run dump:timespans && npm run dump:weekly && npm run dump:lifespans && npm run dump:daily",
+    "server": "ecstatic .",
+    "daily": "npm run dump:daily && npm run server",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npm run dump && npm run server"
   },
   "repository": {
     "type": "git",

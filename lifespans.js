@@ -16,10 +16,13 @@ module.exports = function (sbot, cb) {
         sbot.createHistoryStream({id: data.id, sequence: data.sequence  - 1}),
         pull.find(null, function (err, msg) {
           if (err) throw err
+          if (msg == null) return cb(null)
           cb(null, { id: data.id, last: msg.value.timestamp })
         })
       )
     }),
+
+    pull.filter(),
 
     // now get the timestamp of the first message for all users
     paramap(function (user, cb) {
