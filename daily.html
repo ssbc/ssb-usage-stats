@@ -128,7 +128,8 @@ getJSON('daily.json', function (err, data) {
   var h = userIds.length
   // canvas.style.width = '100%'
 
-  pixelW = Math.floor(window.innerWidth / w)
+  console.log('grid', window.innerWidth, w, window.innerWidth/ w)
+  pixelW = Math.max(Math.floor(window.innerWidth / w), 1)
   pixelH = pixelW
 
   // make the grid like a stacked histogram
@@ -158,6 +159,7 @@ getJSON('daily.json', function (err, data) {
 
 function drawAll() {
   var w = grid.length, h = canvasH
+  console.log(w , h , pixelW, pixelH)
   var imgData = ctx.createImageData(w * pixelW, h * pixelH)
   for (var x = 0; x < w; x++)
     for (var y = 0; y < grid[x].length; y++)
