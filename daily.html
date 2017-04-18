@@ -52,12 +52,12 @@ function interpolate(a, b, n) {
   <canvas id="grid"></canvas>
 </div>
 
-<div id="day-info" style="float:right; text-align:right; display:none">
+<div id="day-info" style="float:right; text-align:right;">
   <div><ins id="day"> </ins></div>
   <div><ins id="day-users"> </ins> users</div>
 </div>
 
-<div id="user-info" style="display:none">
+<div id="user-info">
   <img id="user-img" style="float:left; height: 80px; margin: 8px" alt="">
   <div>Name: <span id="user-name"> </span></div>
   <div>User: <a id="user-link"><span id="user-id"> </span></a></div>
@@ -231,7 +231,7 @@ function dayStr(day) {
 function setHighlight(userI, oldI, dayX, oldX) {
   var userId = userIds[userI]
   if (userId) {
-    userInfo.style.display = ''
+    userInfo.style.visibility = 'visible'
     userLink.href = userId ?
       'http://localhost:7777/#/profile/' + encodeURIComponent(userId) : ''
     userIdText.nodeValue = userId || ''
@@ -243,15 +243,15 @@ function setHighlight(userI, oldI, dayX, oldX) {
     firstText.nodeValue = dayStr(userFirst[userI])
     lastText.nodeValue = dayStr(userLast[userI])
   } else {
-    userInfo.style.display = 'none'
+    userInfo.style.visibility = 'hidden'
   }
 
   if (dayX >= 0) {
-    dayInfo.style.display = ''
+    dayInfo.style.visibility = 'visible'
     dayText.nodeValue = dayStr(dayX)
     dayUsersText.nodeValue = (grid[dayX] || '').length
   } else {
-    dayInfo.style.display = 'none'
+    dayInfo.style.visibility = 'hidden'
   }
 
   var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height)
